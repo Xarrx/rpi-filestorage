@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Image Upload{% endblock %}
+{% block head %}
+    {% load static %}
+{% endblock %}
+{% block content %}
+<form action="" method="post">
+    {% csrf_token %}
+    <!--<input type="file" id="file_upload" name="filename">-->
+    {{ form }}
+    <input type="submit" value="Upload">
+</form>
+{% endblock %}
