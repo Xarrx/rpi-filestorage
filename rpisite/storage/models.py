@@ -1,4 +1,5 @@
 from django.db import models
+from PIL import Image
 
 # Create your models here.
 
@@ -12,16 +13,41 @@ class ImageData(models.Model):
     # DONE define the upload_to option (subdirectory of MEDIA_ROOT.
     # 3. use "image.url" to get the image. {{ object.image.url }} in a template.
     #
-    # TODO: thumbnail field
-    # 1-3. Same as the image field above but specific for image thumbnails.
-    #
     image = models.ImageField(upload_to='images/%Y/%m/%d')
-    thumbnail = models.ImageField(upload_to='thumbs/%Y/%m/%d')
     date_uploaded = models.DateField(auto_now=True)
     # type will not be used; managed by the image field (restricts to images).
     # size will not be used; managed by the image field (obecjt.image.size, calls Storage.size() method)
     def __str__(self):
         return self.image.url
+    
+'''
+ Model for handling thumbnails
+'''
+class ThumbnailData(models.Model):
+    #
+    # TODO: thumbnail field
+    # 1-3. Same as the image field above but specific for image thumbnails.
+    #
+    thumbnail = models.ImageField(upload_to='thumbs/%Y/%m/%d')
+    image = models.ForeignKey(ImageData, on_delete=models.CASCADE)
+    
+    def save(self, *args, **kwargs):
+        # save the model first
+        super().save()
+        
+        # open via PIL
+        img = Image.open(self.thumbnail.path)
+        
+        # make thumbnail
+        size = (128, 128)
+        img.thumbnail(size, Image.ANTIALIAS)
+        
+        # save the new thumbnail image
+        img.save(self.thumbnail.path)
+            
+    
+    def __str__(self):
+        return self.thumbnail.url
 '''
  Model for handling tags on the app.
 '''
